@@ -30,8 +30,8 @@ from #sales_1517
 join dbo.Products
 on dbo.Products.productkey = #sales_1517.productkey
 group by DATETRUNC(month, #sales_1517.orderdate)
-ORDER by monthyear 
-
+ORDER by 1
+    
 -------------------
 -- Tinh sales_qty va returns_qty tung thang cua tung product key (Purpose: Tinh doanh thu/Loi nhuan rong)
 
@@ -64,7 +64,7 @@ JOIN
     ) AS total_returns 
 ON total_sales.month_sales = total_returns.month_returns
     AND s_productkey = r_productkey
-ORDER BY month_sales 
+ORDER BY 1 
 
 -----------------
  -- Tinh so transactions cua tung khach hang qua tung nam
@@ -107,4 +107,16 @@ FROM Customers c
 JOIN #sales_1517 s ON c.CustomerKey = s.CustomerKey 
 Where Gender is not NULL) as sub 
 GROUP BY year, gender
-ORDER BY year, gender 
+ORDER BY 1,3 
+    
+-------------------
+-- Tinh doanh thu tung khu vuc trong tung nam
+SELECT   
+    DATEPART(year,orderdate) as year,
+    t.country AS country,
+    SUM(p.productprice * s.orderquantity) AS total_amt_sales
+FROM Territories t
+JOIN #sales_1517 s ON t.salesterritorykey = s.TerritoryKey
+JOIN Products p ON p.ProductKey = s.ProductKey
+GROUP BY DATEPART(year,orderdate),t.country
+ORDER BY 1,2
